@@ -5,16 +5,11 @@ import crypto from 'crypto'
 
 const log: debug.IDebugger = debug('app:auth-controller')
 
-// @ts-expect-error
-const jwtSecret: string = process.env.JWT_SECRET
+const jwtSecret: string = process.env.JWT_SECRET ?? 'secret'
 const tokenExpirationInSeconds = 36000
 
 class AuthController {
-    async createJWT(
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-    ) {
+    async createJWT(req: express.Request, res: express.Response) {
         try {
             const refreshId = req.body.userId + jwtSecret
             const salt = crypto.createSecretKey(crypto.randomBytes(16))
@@ -31,7 +26,7 @@ class AuthController {
                 .status(201)
                 .send({ accessToken: token, refreshToken: hash })
         } catch (err) {
-            log('createJWT error %0', err)
+            log('createJWT error: %O', err)
             return res.status(500).send()
         }
     }

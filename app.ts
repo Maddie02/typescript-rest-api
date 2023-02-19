@@ -7,11 +7,9 @@ import cors from 'cors'
 import { CommonRoutesConfig } from './common/common.routes.config'
 import { UserRoutes } from './users/users.routes.config'
 import debug from 'debug'
+import { AuthRoutes } from './auth/auth.routes.config'
 
-const dotenvConfig = dotenv.config()
-if (dotenvConfig.error) {
-    throw dotenvConfig.error
-}
+dotenv.config()
 
 const app: express.Application = express()
 const server: http.Server = http.createServer(app)
@@ -38,6 +36,7 @@ if (!process.env.DEBUG) {
 app.use(expressWinston.logger(loggerOptions))
 
 routes.push(new UserRoutes(app))
+routes.push(new AuthRoutes(app))
 
 const runningMessage = `Server running at http://localhost:${port}`
 app.get('/', (req: express.Request, res: express.Response) => {
