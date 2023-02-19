@@ -6,27 +6,27 @@ import { PatchUserDto } from '../dto/patch.user.dto'
 
 class UserService implements CRUD {
     async list(limit: number, page: number) {
-        return UsersDao.getUsers()
+        return UsersDao.getUsers(limit, page)
     }
 
     async create(resource: any) {
         return UsersDao.addUser(resource)
     }
 
-    async putById(id: string, resource: any) {
-        return UsersDao.putUserById(id, resource)
+    async putById(id: string, resource: any): Promise<any> {
+        return UsersDao.updateUserById(id, resource)
     }
 
     async readById(id: string) {
-        return UsersDao.getUserByid(id)
+        return UsersDao.getUserById(id)
     }
 
-    async deleteById(id: string) {
+    async deleteById(id: string): Promise<any> {
         return UsersDao.removeUserById(id)
     }
 
-    async patchById(id: string, resource: any) {
-        return UsersDao.patchUserById(id, resource)
+    async patchById(id: string, resource: any): Promise<any> {
+        return UsersDao.updateUserById(id, resource)
     }
 
     async getUserByEmail(email: string) {

@@ -9,7 +9,6 @@ class MongooseService {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         serverSelectionTimeoutMS: 5000,
-        useFindAndModify: false,
     }
 
     constructor() {
