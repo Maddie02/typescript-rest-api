@@ -8,6 +8,7 @@ import { CommonRoutesConfig } from './common/common.routes.config'
 import { UserRoutes } from './users/users.routes.config'
 import debug from 'debug'
 import { AuthRoutes } from './auth/auth.routes.config'
+import helmet from 'helmet'
 
 dotenv.config()
 
@@ -19,6 +20,7 @@ const debugLog: debug.IDebugger = debug('app')
 
 app.use(express.json())
 app.use(cors())
+app.use(helmet())
 
 const loggerOptions: expressWinston.LoggerOptions = {
     transports: [new winston.transports.Console()],
