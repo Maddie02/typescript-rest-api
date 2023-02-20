@@ -4,6 +4,9 @@ import usersController from './controllers/users.controller'
 import usersMiddleware from './middleware/users.middleware'
 import { body } from 'express-validator'
 import bodyValidationMiddleware from '../common/middleware/body.validation.middleware'
+import jwtMiddleware from '../auth/middleware/jwt.middleware'
+import permissionMiddleware from '../common/middleware/common.permission.middleware'
+import { PermissionFlag } from '../common/middleware/common.permissionflag.enum'
 
 export class UserRoutes extends CommonRoutesConfig {
     constructor(app: express.Application) {
@@ -13,7 +16,13 @@ export class UserRoutes extends CommonRoutesConfig {
     configureRoutes(): express.Application {
         this.app
             .route('/users')
-            .get(usersController.listUsers)
+            .get(
+                jwtMiddleware.validJWTNeeded,
+                permissionMiddleware.permissionFlagRequired(
+                    PermissionFlag.ADMIN_PERMISSION
+                ),
+                usersController.listUsers
+            )
             .post(
                 body('email').isEmail(),
                 body('password')
@@ -28,7 +37,11 @@ export class UserRoutes extends CommonRoutesConfig {
 
         this.app
             .route('/users/:userId')
-            .all(usersMiddleware.validateUserExists)
+            .all(
+                usersMiddleware.validateUserExists,
+                jwtMiddleware.validJWTNeeded,
+                permissionMiddleware.onlySameUserOrAdminCanDoThisAction
+            )
             .get(usersController.getUserById)
             .delete(usersController.removeUser)
 
@@ -42,6 +55,7 @@ export class UserRoutes extends CommonRoutesConfig {
             body('permissionFlags').isInt(),
             bodyValidationMiddleware.verifyBodyFieldsErrors,
             usersMiddleware.validateSameEmailBelongToSameUser,
+            usersMiddleware.userCantChangePermission,
             usersController.put,
         ])
 
@@ -56,6 +70,7 @@ export class UserRoutes extends CommonRoutesConfig {
             body('permissionFlags').isInt().optional(),
             bodyValidationMiddleware.verifyBodyFieldsErrors,
             usersMiddleware.validatePatchEmail,
+            usersMiddleware.userCantChangePermission,
             usersController.patch,
         ])
 
