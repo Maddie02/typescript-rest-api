@@ -7,6 +7,7 @@ import bodyValidationMiddleware from '../common/middleware/body.validation.middl
 import jwtMiddleware from '../auth/middleware/jwt.middleware'
 import permissionMiddleware from '../common/middleware/common.permission.middleware'
 import { PermissionFlag } from '../common/middleware/common.permissionflag.enum'
+import commonPermissionMiddleware from '../common/middleware/common.permission.middleware'
 
 export class UserRoutes extends CommonRoutesConfig {
     constructor(app: express.Application) {
@@ -56,11 +57,14 @@ export class UserRoutes extends CommonRoutesConfig {
             bodyValidationMiddleware.verifyBodyFieldsErrors,
             usersMiddleware.validateSameEmailBelongToSameUser,
             usersMiddleware.userCantChangePermission,
+            commonPermissionMiddleware.permissionFlagRequired(
+                PermissionFlag.PAID_PERMISSION
+            ),
             usersController.put,
         ])
 
         this.app.patch('/users/:userId', [
-            body('email').isEmail(),
+            body('email').isEmail().optional(),
             body('password')
                 .isLength({ min: 5 })
                 .withMessage('Must include password (5+ characters)')
@@ -71,6 +75,9 @@ export class UserRoutes extends CommonRoutesConfig {
             bodyValidationMiddleware.verifyBodyFieldsErrors,
             usersMiddleware.validatePatchEmail,
             usersMiddleware.userCantChangePermission,
+            permissionMiddleware.permissionFlagRequired(
+                PermissionFlag.PAID_PERMISSION
+            ),
             usersController.patch,
         ])
 
