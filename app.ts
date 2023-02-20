@@ -31,6 +31,9 @@ const loggerOptions: expressWinston.LoggerOptions = {
 
 if (!process.env.DEBUG) {
     loggerOptions.meta = false
+    if (typeof global.it === 'function') {
+        loggerOptions.level = 'http'
+    }
 }
 
 app.use(expressWinston.logger(loggerOptions))
@@ -43,7 +46,7 @@ app.get('/', (req: express.Request, res: express.Response) => {
     res.status(200).send(runningMessage)
 })
 
-server.listen(port, () => {
+export default server.listen(port, () => {
     routes.forEach((route: CommonRoutesConfig) => {
         debugLog(`Routes configured for ${route.getName()}`)
     })
